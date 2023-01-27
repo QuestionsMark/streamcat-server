@@ -3,13 +3,14 @@ import express from "express";
 import { Server } from "socket.io";
 import cors from "cors";
 
-import { CORS_ORIGIN } from "./config/config";
+import { CORS_ORIGIN, DB_CONNECTION } from "./config/config";
 import { errorHandling } from "./middlewares/errors.middleware";
-import { homeRouter } from "./routers";
+import { homeRouter, roomRouter } from "./routers";
 
 // Important imports
 import "express-async-errors";
 import { socketManager } from "./socket";
+import { connect } from "mongoose";
 
 // App config
 const port = process.env.PORT || 3001;
@@ -27,13 +28,21 @@ app.use(express.json());
 app.use(express.static('./public'));
 app.use(cors({
     origin: CORS_ORIGIN,
+    credentials: true,
 }))
 
 // Routers
 app.use('/', homeRouter);
+app.use('/room', roomRouter);
 
 // Error handling
 app.use(errorHandling);
+
+// DB config
+
+connect(DB_CONNECTION, async () => {
+    console.log('Connected to database.');
+});
 
 // Socket menager
 socketManager();
