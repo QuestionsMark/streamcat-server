@@ -47,3 +47,13 @@ export interface VideoPlayResponsePayload {
     date: number;
     played: number;
 }
+
+export interface VideoSeekRequestPayload {
+    date: number;
+    played: number;
+}
+
+export interface VideoSeekResponsePayload {
+    date: number;
+    played: number;
+}

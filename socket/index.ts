@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { io } from ".."
 import { Connection } from "../models/connection.model";
 import { Room } from "../models/room.model";
-import { RoomDataPayload, RoomExitedPayload, RoomExitPayload, RoomJoinedPayload, RoomJoinPayload, VideoPlayRequestPayload, VideoPlayResponsePayload } from "../types";
+import { RoomDataPayload, RoomExitedPayload, RoomExitPayload, RoomJoinedPayload, RoomJoinPayload, VideoPlayRequestPayload, VideoPlayResponsePayload, VideoSeekRequestPayload, VideoSeekResponsePayload } from "../types";
 import { exitRoom, getRoomClients } from "./socket-helpers";
 
 export const socketManager = async () => {
@@ -10,6 +10,10 @@ export const socketManager = async () => {
         socket.broadcast.emit('user-connected', `Dołączył użytkownik o id: ${socket.id}`);
         socket.on('disconnect', async () => {
             exitRoom(socket.id);
+            const clients = await getRoomClients(socket.id);
+            if (!clients) return;
+            const username = clients[clients.findIndex(c => c.socketId === socket.id)].username;
+            io.to(clients.map(c => c.socketId)).emit('room-exited', { username: username || 'Someone' } as RoomExitedPayload);
         })
 
         // Room
@@ -30,9 +34,7 @@ export const socketManager = async () => {
 
         socket.on('room-exit', async ({ roomId, username }: RoomExitPayload) => {
             exitRoom(socket.id);
-            const room = await Room.findOne({ _id: roomId });
-            if (!room) return;
-            io.to(room.clients.map(c => c.socketId)).emit('room-exited', { username } as RoomExitedPayload);
+            io.to(await (await getRoomClients(socket.id)).map(c => c.socketId)).emit('room-exited', { username } as RoomExitedPayload);
         })
 
         // Video
@@ -41,6 +43,9 @@ export const socketManager = async () => {
         })
         socket.on('video-pause-request', async () => {
             io.to((await getRoomClients(socket.id)).map(c => c.socketId)).emit('video-pause-response');
+        })
+        socket.on('video-seek-request', async ({ date, played }: VideoSeekRequestPayload) => {
+            io.to((await getRoomClients(socket.id)).map(c => c.socketId)).emit('video-seek-response', { date, played } as VideoSeekResponsePayload);
         })
     })
 };

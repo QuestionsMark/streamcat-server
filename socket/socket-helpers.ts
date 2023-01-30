@@ -10,10 +10,10 @@ export const exitRoom = async (socketId: string) => {
     await Connection.deleteOne({ socketId });
 };
 
-export const getRoomClients = async (socketId: string): Promise<RoomClient[]> => {
+export const getRoomClients = async (socketId: string): Promise<RoomClient[] | null> => {
     const connection = await Connection.findOne({ socketId });
-    if (!connection) return;
+    if (!connection) return null;
     const room = await Room.findOne({ _id: connection.room });
-    if (!room) return;
+    if (!room) return null;
     return room.clients as RoomClient[];
 };
