@@ -2,10 +2,18 @@ import { model, Schema } from "mongoose";
 
 export const Room = model('room', new Schema({
     clients: [{
-        socketId: String,
-        username: String,
         host: Boolean,
+        username: String,
+        socketId: String,
+        avatar: {
+            type: String,
+            nullable: true,
+        },
     }],
+    src: {
+        type: String,
+        default: '',
+    },
     createdAt: {
         type: Date,
         default: () => new Date(),
