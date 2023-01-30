@@ -13,16 +13,18 @@ export interface RoomJoinPayload {
     avatar?: string;
 }
 export interface RoomJoinedPayload {
-    username: string;
     clients: RoomClient[];
+    id: string;
+    username: string;
 }
 
 export interface RoomExitPayload {
     username: string;
 }
 export interface RoomExitedPayload {
-    username: string;
     clients: RoomClient[];
+    id: string;
+    username: string;
 }
 
 export interface RoomVideoNewPayload {
@@ -52,4 +54,12 @@ export interface VideoSeekRequestPayload {
 export interface VideoSeekResponsePayload {
     date: number;
     played: number;
+}
+
+// Chat Payloads
+
+export interface ChatMessagePayload {
+    id: string;
+    message: string;
+    username: string;
 }
