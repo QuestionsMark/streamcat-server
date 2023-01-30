@@ -14,14 +14,15 @@ export interface RoomJoinPayload {
 }
 export interface RoomJoinedPayload {
     username: string;
+    clients: RoomClient[];
 }
 
 export interface RoomExitPayload {
-    roomId: string;
     username: string;
 }
 export interface RoomExitedPayload {
     username: string;
+    clients: RoomClient[];
 }
 
 export interface RoomVideoNewPayload {
@@ -30,11 +31,6 @@ export interface RoomVideoNewPayload {
 
 export interface RoomDataPayload {
     src: string;
-    clients: RoomClient[];
-}
-
-export interface RoomSynchronizedPayload {
-    time: number;
 }
 
 // Video Payloads

@@ -9,11 +9,15 @@ export const socketManager = async () => {
     io.on('connection', socket => {
         socket.broadcast.emit('user-connected', `Dołączył użytkownik o id: ${socket.id}`);
         socket.on('disconnect', async () => {
-            exitRoom(socket.id);
             const clients = await getRoomClients(socket.id);
+            exitRoom(socket.id);
             if (!clients) return;
-            const username = clients[clients.findIndex(c => c.socketId === socket.id)].username;
-            io.to(clients.map(c => c.socketId)).emit('room-exited', { username: username || 'Someone' } as RoomExitedPayload);
+            const index = clients.findIndex(c => c.socketId === socket.id)
+            const client = index !== -1 ? clients[index] : null;
+
+            const newClients = clients.filter(c => c.socketId !== socket.id);
+
+            io.to(newClients.map(c => c.socketId)).emit('room-exited', { username: client?.username || 'Someone', clients: newClients } as RoomExitedPayload);
         })
 
         // Room
@@ -27,14 +31,17 @@ export const socketManager = async () => {
                 { $push: { clients: { host: clients.length === 0, socketId, username, avatar: avatar || null } } },
             );
             console.log(`Klient o id ${socketId} dołączył do pokoju.`);
+            const { clients: newClients } = await Room.findOne({ _id: roomId });
 
-            io.to(socket.id).emit('room-data', { clients, src } as RoomDataPayload);
-            io.to(clients.map(c => c.socketId)).emit('room-joined', { username } as RoomJoinedPayload);
+            io.to(socket.id).emit('room-data', { src } as RoomDataPayload);
+            io.to(newClients.map(c => c.socketId)).emit('room-joined', { username, clients: newClients } as RoomJoinedPayload);
         })
 
-        socket.on('room-exit', async ({ roomId, username }: RoomExitPayload) => {
+        socket.on('room-exit', async ({ username }: RoomExitPayload) => {
             exitRoom(socket.id);
-            io.to(await (await getRoomClients(socket.id)).map(c => c.socketId)).emit('room-exited', { username } as RoomExitedPayload);
+            const clients = await getRoomClients(socket.id);
+            if (!clients) return;
+            io.to(clients.map(c => c.socketId)).emit('room-exited', { username, clients } as RoomExitedPayload);
         })
 
         // Video
@@ -47,5 +54,7 @@ export const socketManager = async () => {
         socket.on('video-seek-request', async ({ date, played }: VideoSeekRequestPayload) => {
             io.to((await getRoomClients(socket.id)).map(c => c.socketId)).emit('video-seek-response', { date, played } as VideoSeekResponsePayload);
         })
+
+        // Chat
     })
 };
