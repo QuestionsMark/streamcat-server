@@ -5,7 +5,7 @@ import cors from "cors";
 
 import { CORS_ORIGIN, DB_CONNECTION } from "./config/config";
 import { errorHandling } from "./middlewares/errors.middleware";
-import { homeRouter, roomRouter } from "./routers";
+import { homeRouter, roomRouter, userRouter } from "./routers";
 
 // Important imports
 import "express-async-errors";
@@ -35,6 +35,7 @@ app.use(cors({
 // Routers
 app.use('/', homeRouter);
 app.use('/room', roomRouter);
+app.use('/user', userRouter);
 
 // Error handling
 app.use(errorHandling);

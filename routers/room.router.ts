@@ -8,7 +8,7 @@ export const roomRouter = Router()
     // Create room
     .post('/', async (req, res) => {
         const { _id } = await Room.create({});
-        res.send(sendSuccessfullResponse(_id.toString()));
+        res.status(201).send(sendSuccessfullResponse(_id.toString()));
     })
 
     // Pobieranie danych o video
@@ -21,5 +21,5 @@ export const roomRouter = Router()
         const { clients } = room;
         await Room.findOneAndUpdate({ _id }, { $set: { src } });
         io.to(clients.map(c => c.socketId)).emit('room-video-new', { src } as RoomVideoNewPayload);
-        res.send('New video has been sent.')
+        res.status(200).send(sendSuccessfullResponse('New video has been sent.'));
     })

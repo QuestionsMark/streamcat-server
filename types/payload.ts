@@ -63,3 +63,8 @@ export interface ChatMessagePayload {
     message: string;
     username: string;
 }
+
+// Client Payloads
+export interface ClientSettingsChangePayload {
+    clients: RoomClient[];
+}
