@@ -11,6 +11,7 @@ export class ValidationError extends Error {
 }
 
 export const errorHandling = (err: unknown, req: Request, res: Response, next: NextFunction) => {
+    console.error(err);
     if (err instanceof ValidationError) {
         return res.status(400).json(sendErrorResponse(err.message, err.problems));
     }

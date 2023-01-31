@@ -44,10 +44,10 @@ app.use(errorHandling);
 
 connect(DB_CONNECTION, async () => {
     console.log('Connected to database.');
+    
+    // Listener
+    server.listen(port, () => console.log(`Server is listening on http://localhost:${port}`));
 });
 
 // Socket menager
 socketManager();
-
-// Listener
-server.listen(port, () => console.log(`Server is listening on http://localhost:${port}`));

@@ -31,7 +31,6 @@ export const socketManager = async () => {
                 { _id: roomId },
                 { $push: { clients: { host: clients.length === 0, socketId, username, avatar: avatar || null } } },
             );
-            console.log(`Klient o id ${socketId} dołączył do pokoju.`);
             const { clients: newClients } = await Room.findOne({ _id: roomId });
 
             io.to(socket.id).emit('room-data', { src } as RoomDataPayload);

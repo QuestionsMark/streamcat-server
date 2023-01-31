@@ -21,5 +21,5 @@ export const roomRouter = Router()
         const { clients } = room;
         await Room.findOneAndUpdate({ _id }, { $set: { src } });
         io.to(clients.map(c => c.socketId)).emit('room-video-new', { src } as RoomVideoNewPayload);
-        res.status(200).send(sendSuccessfullResponse('New video has been sent.'));
+        res.status(200).send(sendSuccessfullResponse('Video changed.'));
     })
