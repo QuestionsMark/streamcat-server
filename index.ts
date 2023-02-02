@@ -3,7 +3,7 @@ import express from "express";
 import { Server } from "socket.io";
 import cors from "cors";
 
-import { CORS_ORIGIN, DB_CONNECTION } from "./config/config";
+import { CORS_ORIGIN, DB_CONNECTION, PORT } from "./config/config";
 import { errorHandling } from "./middlewares/errors.middleware";
 import { homeRouter, roomRouter, userRouter } from "./routers";
 
@@ -12,8 +12,7 @@ import "express-async-errors";
 import { socketManager } from "./socket";
 import { connect } from "mongoose";
 
-// App config
-const port = process.env.PORT || 3001;
+// App setup
 const app = express();
 
 const server = createServer(app);
@@ -44,9 +43,9 @@ app.use(errorHandling);
 
 connect(DB_CONNECTION, async () => {
     console.log('Connected to database.');
-    
+
     // Listener
-    server.listen(port, () => console.log(`Server is listening on http://localhost:${port}`));
+    server.listen(PORT, () => console.log(`Server is listening on http://localhost:${PORT}`));
 });
 
 // Socket menager
